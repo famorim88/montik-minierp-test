@@ -1,61 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Montik Mini ERP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Mini ERP Laravel com suporte a:
+- Cadastro de produtos e variações de estoque
+- Carrinho de compras com frete inteligente
+- Aplicação de cupons válidos com regras de subtotal
+- Integração com ViaCEP
+- Envio de e-mail de confirmação de pedido
+- Webhook para atualização/cancelamento de status
+- Seeders e factories para dados simulados
+- Ambiente Docker com Laravel + MySQL
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Executando com Docker
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Pré-requisitos
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Clone o projeto
+```bash
+git clone https://github.com/famorim88/montik-minierp-test.git
+cd montik-minierp-test
+```
 
-## Learning Laravel
+### Copie e edite seu arquivo `.env`
+```bash
+cp .env.example .env
+```
+Ajuste se necessário:
+```env
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=montik
+DB_USERNAME=montik_user
+DB_PASSWORD=montik_pass
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Inicie o ambiente
+```bash
+docker-compose up --build
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Acesse: [http://localhost:8000](http://localhost:8000)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 📦 Recursos
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Produtos
+- Cadastro com nome, preço e múltiplas variações (estoque por variação)
 
-### Premium Partners
+### Carrinho
+- Gerenciado por sessão
+- Calcula subtotal + frete automaticamente:
+  - R$52 a R$166,59 → Frete R$15
+  - Acima de R$200 → Frete grátis
+  - Caso contrário → Frete R$20
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Checkout
+- Validação de endereço por CEP (ViaCEP)
+- Cupom (com validade e mínimo de carrinho)
+- Envio de e-mail (mailable personalizado)
 
-## Contributing
+### Webhook
+Endpoint:
+```
+POST /webhook/order
+```
+Body JSON:
+```json
+{
+  "id": 1,
+  "status": "cancelled"
+}
+```
+Cancela ou atualiza pedido pelo ID
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🧪 Seeders e Factories
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Gere dados simulados:
+```bash
+docker exec -it montik_app php artisan migrate:fresh --seed
+```
+- 10 pedidos
+- 5 cupons com regras e validade
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🗃 Estrutura
+```
+├── app
+│   ├── Http/Controllers
+│   ├── Mail/OrderConfirmation.php
+│   ├── Models/{Product, Stock, Order, Coupon}.php
+├── database
+│   ├── factories/{OrderFactory, CouponFactory}.php
+│   ├── seeders/{OrderSeeder, CouponSeeder}.php
+├── resources
+│   └── views/{products, orders, emails}
+├── docker-compose.yml
+├── Dockerfile
+├── .env
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ✨ Créditos
+Desenvolvido por Felipe Marcel Amorim como parte de avaliação técnica.
+
+Repositório: [github.com/famorim88/montik-minierp-test](https://github.com/famorim88/montik-minierp-test)
